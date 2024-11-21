@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <py-script>
+        import PySimpleGUI as sg
+        from yt_dlp import YoutubeDL
+        import os
+        import ffmpeg
+
+        url = "none so far"
+        layout = [[sg.Text("Hello, Video Downloader!")],
+                [sg.Text("Enter the URL which you want to download"),sg.InputText()],
+                [sg.Radio("Video","radio_group",default=True),sg.Radio("Audio","radio_group"),sg.Radio("Both","radio_group")],
+                [sg.Button("Download!")]
+                ]
+        window = sg.Window("Video Downloader", layout ,resizable=True)
+
+        while True:
+            event, values = window.read()
+            if event == sg.WIN_CLOSED:
+                break
+                
+            if event == "Download!":
+                url = values[0]
+                if values[1] == True:
+                    sg.popup_auto_close("wait a second...",auto_close_duration=1)
+                    ydl_opts = {"format":"best/mp4"}
+                    with YoutubeDL(ydl_opts) as ydl:
+                        res = ydl.download(url)
+                        sg.popup("done!")
+                    break
+                    
+                elif values[2] == True:
+                    sg.popup_auto_close("wait a second...",auto_close_duration=1)
+                    ydl_opts = {"format":"bestaudio/mp3",
+                            'postprocessors': [
+                                {'key': 'FFmpegExtractAudio',
+                                'preferredcodec': 'mp3',
+                                'preferredquality': '192'},
+                                {'key': 'FFmpegMetadata'},
+                            ],}
+                    with YoutubeDL(ydl_opts) as ydl:
+                        res = ydl.download(url)
+                        sg.popup("done!")
+                    break
+                    
+                else:
+                    sg.popup_auto_close("wait a second...",auto_close_duration=1)
+                    ydl_opts = {"format":"best/mp4"}
+                    with YoutubeDL(ydl_opts) as ydl:
+                        res = ydl.download(url)
+                    ydl_opts = {"format":"bestaudio/mp3",
+                            'postprocessors': [
+                                {'key': 'FFmpegExtractAudio',
+                                'preferredcodec': 'mp3',
+                                'preferredquality': '192'},
+                                {'key': 'FFmpegMetadata'},
+                            ],}
+                    with YoutubeDL(ydl_opts) as ydl:
+                        res = ydl.download(url)
+                        sg.popup("done!")
+                    break
+                    
+                break
+
+        window.close()
+    </py-script>
+    
+</body>
+</html>
